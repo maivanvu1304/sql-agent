@@ -1,0 +1,11 @@
+{
+  "env": ".env",
+  "pip_installer": "uv",
+  "dependencies": ["."],
+  "graphs": {
+    "db_sqlite": "src/db_sqlite/graph.py:agent"
+  },
+  "auth": {
+  }
+}
+ 
