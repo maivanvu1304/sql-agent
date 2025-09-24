@@ -22,7 +22,7 @@ run_query_tool=next(tool for tool in tools if tool.name=="sql_db_query")
 get_schema_tool=next(tool for tool in tools if tool.name=="sql_db_schema")
 
 get_schema_node=ToolNode([get_schema_tool], name="get_schema")
-
+tool_cache = {}
 def list_tables(state: MessagesState):
     """
     Predetermined tool call to list all tables and add the result to the state.
@@ -49,13 +49,29 @@ def call_get_schema(state: MessagesState):
 
 def generate_query(state: MessagesState):
     """
-    Generates a SQL query based on the full conversation history.
+    Generates a SQL query based on a condensed version of the conversation history.
     """
     system_message = SystemMessage(content=generate_query_system_prompt(db.dialect))
+    
+    # --- TỐI ƯU HÓA: TÓM TẮT LỊCH SỬ ---
+    history = state["messages"]
+    
+    # Giữ lại các tin nhắn hệ thống quan trọng ban đầu (tên bảng, schema)
+    # và các tin nhắn gần đây nhất để duy trì ngữ cảnh.
+    # Chiến lược: Giữ 3 tin nhắn đầu tiên và 4 tin nhắn cuối cùng.
+    if len(history) > 7:
+        condensed_messages = history[:3] + history[-4:]
+        print("--- History condensed ---") # For debugging
+    else:
+        condensed_messages = history
+    # --- KẾT THÚC TỐI ƯU HÓA ---
+    
     llm_with_tools = llm.bind_tools([run_query_tool])
-    # llm_with_tools = llm.with_structured_output([run_query_tool])
-    response = llm_with_tools.invoke([system_message] + state["messages"])
+    # Sử dụng lịch sử đã được rút gọn để gọi LLM
+    response = llm_with_tools.invoke([system_message] + condensed_messages) 
+    
     return {"messages": [response]}
+
 
 
 def run_query_and_handle_errors(state: MessagesState):
