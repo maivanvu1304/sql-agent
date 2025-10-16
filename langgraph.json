@@ -3,10 +3,7 @@
   "pip_installer": "uv",
   "dependencies": ["."],
   "graphs": {
-    "db_sqlite": "src/db_sqlite/graph.py:agent",
-    "db_sqlite_v2": "src/db_sqlite_v2/graph.py:agent",
-    "db_sqlite_v3": "src/db_sqlite_v3/graph.py:agent",
-    "db_postgres_optimized": "src/db_postgres/optimized_graph.py:agent"
+    "db_sqlite_v2": "src/db_sqlite/supervisor.py:supervisor_agent"
   },
   "auth": {
   }
